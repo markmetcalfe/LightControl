@@ -4,75 +4,48 @@ from datetime import datetime
 from flask import Flask
 from flask import request, redirect, url_for
 
-startTime = 10
-endTime = 18
-errorMsg = "Only Enabled from "+str(startTime)+"am to "+str(endTime-12)+"pm"
+startTime = 12;
+endTime = 17;
 
 app = Flask(__name__)  
+
+if __name__ == "__main__":
+	app.run()
 
 colorRef=["White","Red","Dark_Orange","Orange","Amber","Yellow","Green","Light_Green","Light_Blue","Blue","Indigo","Purple","Pink"]
 colorHex=["#FFFFFF","#ED1515","#F75B07","#F79307","#F7D307","#F2EE0A","#2AF72A","#00FA7D","#00DDFA","#0059FF","#8400FF","#BF00FF","#F200FF"]
 colors=["white","red","darkorange","orange","amber","yellow","green","lightgreen","lightblue","blue","indigo","purple","pink"]
 colorCommand=["WHITE","RED","DARKORANGE","ORANGE","AMBER","YELLOW","GREEN","LIGHTGREEN","LIGHTBLUE","BLUE","INDIGO","PURPLE","PINK"]
 
-def getLineNum(what):
-	if what == 'power':
-		return 0
-	elif what == 'brightness':
-		return 1
-	elif what == 'color':
-		return 2
-	else:
-		return 0
-
-def get(what):
-	with open('/var/www/flask/state.log', 'r') as f:
-		lines = f.readlines()
-		for line in lines:
-			line.strip()
-			line.rstrip('\r\n')
-		return lines[getLineNum(what)]
+def get(file):
+	with open('/var/www/markmetcalfe/light/'+file+'.state', 'r') as f:
+		data = f.read()
 		f.close()
-			
-def write(what, text):
-	with open('/var/www/flask/state.log', 'r') as f:
-		lines = f.readlines()
-		for line in lines:
-			line.strip()
-			line.rstrip('\r\n')
+		return data
+		
+def write(file, str):
+	with open('/var/www/markmetcalfe/light/'+file+'.state', 'w') as f:
+		f.truncate()	
+		f.write(str)
 		f.close()
-	print lines[0]
-	print lines[1]
-	print lines[2]
-	with open('/var/www/flask/state.log', 'w') as new:
-		new.truncate()	
-		i = 0
-		lineNum = getLineNum(what)
-		for line in lines:
-			if i == lineNum:
-				new.write(text)
-			else:
-				new.write(line)
-			i+=1
-		new.close()
 
 @app.route("/")
 def mainpage():
-	with open('/var/www/flask/page.html', 'r') as f:
+	with open('/var/www/markmetcalfe/light/page.html', 'r') as f:
 		data = f.read()
 		f.close()
 		return data
 	
 @app.route("/rel/<page>")
 def localcode(page):
-	with open('/var/www/flask/'+page, 'r') as f:
+	with open('/var/www/markmetcalfe/light/'+page, 'r') as f:
 		data = f.read()
 		f.close()
 		return data
 
-@app.route("/rel/<first>/<second>")
-def externalcode(first, second):
-	with open('/var/www/flask/'+first+'/'+second, 'r') as f:
+@app.route("/rel/<one>/<two>")
+def externalcode(one, two):
+	with open('/var/www/markmetcalfe/light/'+one+'/'+two, 'r') as f:
 		data = f.read()
 		f.close()
 		return data		
@@ -88,7 +61,9 @@ def output(state=None):
 	elif state == 'getcolor':		
 		return get('color')
 	elif state == 'gethex':
-		color = get('color')
+		with open('/var/www/markmetcalfe/light/color.state', 'r') as c:
+			color = c.read()
+			c.close()
 		if get('power')=='Off':
 			return '#000000'
 		else:
@@ -103,17 +78,14 @@ def output(state=None):
 				print "Failed"
 				return "Failed"
 	elif state == 'toggle':
-		if datetime.now().hour >= startTime and datetime.now().hour <= endTime:
-			if get("power") == 'On':
-				subprocess.call(["irsend", "SEND_ONCE", "light", "TURN_OFF"])
-				write("power","Off")
-				return 'Success'
-			elif get("power") == 'Off':
-				subprocess.call(["irsend", "SEND_ONCE", "light", "TURN_ON"])
-				write("power","On")
-				return 'Success'
-		else:
-			return errorMsg
+		if get("power") == 'On':
+			subprocess.call(["irsend", "SEND_ONCE", "light", "TURN_OFF"])
+			write("power","Off")
+			return 'Success'
+		elif get("power") == 'Off':
+			subprocess.call(["irsend", "SEND_ONCE", "light", "TURN_ON"])
+			write("power","On")
+			return 'Success'
 	elif state == 'on':                                                           
 		subprocess.call(["irsend", "SEND_ONCE", "light", "TURN_ON"])
 		write("power","On")		
@@ -168,13 +140,13 @@ def output(state=None):
 		for color in colors:
 			if state == color:
 				subprocess.call(["irsend", "SEND_ONCE", "light", "COLOR_"+colorCommand[i]])
-				write('color',colorRef[i])
+				with open('/var/www/markmetcalfe/light/color.state', 'w') as c:
+					c.truncate()	
+					c.write(colorRef[i])
+					c.close()
 				done = True
 				return 'Success'
 			i+= 1
 		if done == False:
-			print 'Invalid Command Entered'
+			print 'Failed'
 			return '<html><head><title>Failed</title></head><body><font style="font-family: Arial;"><b>Not A Command</b></font></body></html>'
-			
-if __name__ == "__main__":       											
-    app.run(debug=True)
