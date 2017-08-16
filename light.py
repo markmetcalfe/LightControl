@@ -1,16 +1,15 @@
 import subprocess
 import urllib
 from datetime import datetime
-from flask import Flask
-from flask import request, redirect, url_for
+from flask import Flask, request, redirect, url_for, send_from_directory, render_template
 
 startTime = 12;
 endTime = 17;
 
-app = Flask(__name__)  
+app = Flask(__name__, static_url_path='/static')  
 
 if __name__ == "__main__":
-	app.run()
+	app.run(debug=True)
 
 colorRef=["White","Red","Dark_Orange","Orange","Amber","Yellow","Green","Light_Green","Light_Blue","Blue","Indigo","Purple","Pink"]
 colorHex=["#FFFFFF","#ED1515","#F75B07","#F79307","#F7D307","#F2EE0A","#2AF72A","#00FA7D","#00DDFA","#0059FF","#8400FF","#BF00FF","#F200FF"]
@@ -31,24 +30,10 @@ def write(file, str):
 
 @app.route("/")
 def mainpage():
-	with open('/var/www/markmetcalfe/light/page.html', 'r') as f:
+	with open('/var/www/markmetcalfe/light/index.html', 'r') as f:
 		data = f.read()
 		f.close()
-		return data
-	
-@app.route("/rel/<page>")
-def localcode(page):
-	with open('/var/www/markmetcalfe/light/'+page, 'r') as f:
-		data = f.read()
-		f.close()
-		return data
-
-@app.route("/rel/<one>/<two>")
-def externalcode(one, two):
-	with open('/var/www/markmetcalfe/light/'+one+'/'+two, 'r') as f:
-		data = f.read()
-		f.close()
-		return data		
+		return data	
 
 @app.route("/cmd/<state>")                                                          
 def output(state=None):
@@ -79,67 +64,52 @@ def output(state=None):
 				return "Failed"
 	elif state == 'toggle':
 		if get("power") == 'On':
-			subprocess.call(["irsend", "SEND_ONCE", "light", "TURN_OFF"])
 			write("power","Off")
 			return 'Success'
 		elif get("power") == 'Off':
-			subprocess.call(["irsend", "SEND_ONCE", "light", "TURN_ON"])
 			write("power","On")
 			return 'Success'
-	elif state == 'on':                                                           
-		subprocess.call(["irsend", "SEND_ONCE", "light", "TURN_ON"])
+	elif state == 'on':
 		write("power","On")		
 		return 'Success'  
-	elif state == 'off':                                                          
-		subprocess.call(["irsend", "SEND_ONCE", "light", "TURN_OFF"])
+	elif state == 'off':
 		write("power","Off")
 		return 'Success'  
 	elif state == 'brighter':
-		subprocess.call(["irsend", "SEND_ONCE", "light", "BRIGHTNESS_UP"])
 		number = int(get("brightness"))
 		if number < 5:	
 			number += 1
 			write("brightness",str(number))
 		return 'Success'  
 	elif state == 'dim':
-		subprocess.call(["irsend", "SEND_ONCE", "light", "BRIGHTNESS_DOWN"])
 		number = int(get("brightness"))
 		if number > 1:	
 			number -= 1
 			write("brightness",str(number))
 		return 'Success'  
 	elif state == 'darkest':
-		for i in xrange(5):
-			subprocess.call(["irsend", "SEND_ONCE", "light", "BRIGHTNESS_DOWN"])
 		write("brightness","1")
 		return 'Success'  
 	elif state == 'brightest':
-		for i in xrange(5):
-			subprocess.call(["irsend", "SEND_ONCE", "light", "BRIGHTNESS_UP"])	
 		write("brightness","5")
 		return 'Success' 
 	elif state == 'flashfast':
-		subprocess.call(["irsend", "SEND_ONCE", "light", "FLASH_FAST"])	
 		write("color","Flash_Fast")
 		return 'Success'  
 	elif state == 'flashslow':
-		subprocess.call(["irsend", "SEND_ONCE", "light", "FLASH_SLOW"])	
 		write("color","Flash_Slow")
 		return 'Success'  
-	elif state == 'smoothfast':
-		subprocess.call(["irsend", "SEND_ONCE", "light", "SMOOTH_FAST"])	
+	elif state == 'smoothfast':	
 		write("color","Smooth_Fast")
 		return 'Success'  
 	elif state == 'smoothslow':
-		subprocess.call(["irsend", "SEND_ONCE", "light", "SMOOTH_SLOW"])
 		write("color","Smooth_Slow")
 		return 'Success'  		
 	else:
 		done = False
 		i = 0
 		for color in colors:
-			if state == color:
-				subprocess.call(["irsend", "SEND_ONCE", "light", "COLOR_"+colorCommand[i]])
+			if state.lower() == color.lower():
 				with open('/var/www/markmetcalfe/light/color.state', 'w') as c:
 					c.truncate()	
 					c.write(colorRef[i])
