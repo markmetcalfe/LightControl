@@ -1,5 +1,6 @@
 import subprocess
 import urllib
+import json
 import os
 import pickle
 from datetime import datetime
@@ -57,6 +58,10 @@ def write(power=None, brightness=None, color=None):
         new.color = color
     pickle.dump(new, open(os.path.dirname(os.path.realpath(__file__)) + '/state.data', 'wb'))
 
+
+@app.route("/map")
+def map():
+    return json.dumps(colors, sort_keys=True, indent=4, separators=(',', ': '))
 
 @app.route("/hour")
 def hour():
