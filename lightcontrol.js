@@ -1,6 +1,5 @@
 /* Taken from http://stackoverflow.com/posts/13542669/revisions
- * Everything after this function I wrote myself, except for the ajax stuff, 
- * but that is pretty standard throughout most stuff anyways.
+ * Everything after this function I wrote myself
  */
 function blendColors(c0, c1, p) {
     var f = parseInt(c0.slice(1), 16),
@@ -20,7 +19,8 @@ function changeSize() {
 }
 
 function format(str) {
-    return str.split(' ').join('').toLowerCase();
+    str.split(' ').join('');
+    return str.toLowerCase();
 }
 
 var refreshTimer = 10;
@@ -47,10 +47,9 @@ window.onload = function() {
         type: "GET",
         cache: false,
         success: function(returnhtml) {
-            colorMap = JSON.parse(returnhtml);
+            colorMap = new Map(JSON.parse(returnhtml));
         }
     });
-    changeSize();
     update();
 };
 
@@ -74,60 +73,59 @@ window.setInterval(function() {
 var powerButtonCreated = false;
 
 function update() {
-    $.when(
-        $.ajax({
-            url: "data/power",
-            type: "GET",
-            cache: false,
-            success: function(returnhtml) {
-                if (power != returnhtml) {
-                    power = returnhtml;
-                    if (powerButtonCreated === false) {
-                        document.getElementById("powerButton").innerHTML = '<a onclick="toggle();return false;" style="padding: -5px 0px 0px 15px;"><button id="toggle" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--toggle"></button></a>';
-                        updateToggleButton(power);
-                        powerButtonCreated = true;
-                    }
-                    document.getElementById("powerstatus").innerHTML = '<span class="' + power + '">' + power + '</span>';
-                    power == "Off" ? fadeDark() : fadeColor();
+    $.ajax({
+        url: "data/power",
+        type: "GET",
+        cache: false,
+        success: function(returnhtml) {
+            if (power != returnhtml) {
+                power = returnhtml;
+                if (powerButtonCreated === false) {
+                    document.getElementById("powerButton").innerHTML = '<a onclick="toggle();return false;" style="padding: -5px 0px 0px 15px;"><button id="toggle" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--toggle"></button></a>';
+                    updateToggleButton(power);
+                    powerButtonCreated = true;
                 }
+                document.getElementById("powerstatus").innerHTML = '<span class="' + power + '">' + power + '</span>';
+                power == "Off" ? fadeDark() : fadeColor();
             }
-        }),
-        $.ajax({
-            url: "data/brightness",
-            type: "GET",
-            cache: false,
-            success: function(returnhtml) {
-                brightness = JSON.parse(returnhtml);
-                if (power == "On") {
-                    fadeColor();
-                    document.getElementById("brightness").innerHTML = '<span class="Level_' + brightness + '">' + brightness + '</span>';
-                } else {
-                    fadeDark();
-                    document.getElementById("brightness").innerHTML = '<span class="Off">Off</span>';
-                    $(".metaColor").attr("content", "#000");
-                }
-                refreshTimer = 10;
+        }
+    });
+    $.ajax({
+        url: "data/brightness",
+        type: "GET",
+        cache: false,
+        success: function(returnhtml) {
+            brightness = JSON.parse(returnhtml);
+            if (power == "On") {
+                fadeColor();
+                document.getElementById("brightness").innerHTML = '<span class="Level_' + brightness + '">' + brightness + '</span>';
+            } else {
+                fadeDark();
+                document.getElementById("brightness").innerHTML = '<span class="Off">Off</span>';
+                $(".metaColor").attr("content", "#000");
             }
-        }),
-        $.ajax({
-            url: "data/color",
-            type: "GET",
-            cache: false,
-            success: function(returnhtml) {
-                color = returnhtml;
-                updateColor();
-            }
-        }),
-        $.ajax({
-            url: "data/hex",
-            type: "GET",
-            cache: false,
-            success: function(returnhtml) {
-                hex = returnhtml;
-                updateColor();
-            }
-        })
-    ).then(draw());
+            refreshTimer = 10;
+        }
+    });
+    $.ajax({
+        url: "data/color",
+        type: "GET",
+        cache: false,
+        success: function(returnhtml) {
+            color = returnhtml;
+            updateColor();
+        }
+    });
+    $.ajax({
+        url: "data/hex",
+        type: "GET",
+        cache: false,
+        success: function(returnhtml) {
+            hex = returnhtml;
+            updateColor();
+        }
+    });
+    changeSize();
 }
 
 function toggle() {
@@ -217,12 +215,12 @@ function fadeDark() {
 }
 
 function fadeColor() {
-    updateToggleButton(lastPower);
+    updateToggleButton(power);
     if (hex === null || brightness === null) {} else {
-        hex = colorMap.get(color)
+        //hex = colorMap.get(color)
         $(".metaColor").attr("content", hex);
         var lightColor = blendColors(hex, "#FFFFFF", 0.75);
-        var fadeColor = blendColors("#000000", lightColor, 0.6 + (lastBrightness * 0.08));
+        var fadeColor = blendColors("#000000", lightColor, 0.6 + (brightness * 0.08));
         $('body').animate({
             backgroundColor: fadeColor
         }, {
@@ -242,7 +240,7 @@ function setColor(color) {
     refreshTimer = 10;
     if (power == "On") {
         send('setcolor/' + color);
-        hex = colorMap.get(color);
+        //hex = colorMap.get(color);
         document.getElementById("colorstatus").innerHTML = '<span class="' + format(color) + '">' + color + '</span>';
         $(".metaColor").attr("content", hex);
         fadeColor();
@@ -259,25 +257,25 @@ function setBrightness(Button) {
     refreshTimer = 10;
     if (power == "On") {
         if (Button == "dim") {
-            if (lastBrightness > minBrightness) {
-                lastBrightness--;
+            if (brightness > minBrightness) {
+                brightness--;
             } else {
-                lastBrightness = minBrightness;
+                brightness = minBrightness;
             }
         } else if (Button == "brighter") {
-            if (lastBrightness < maxBrightness) {
-                lastBrightness++;
+            if (brightness < maxBrightness) {
+                brightness++;
             } else {
-                lastBrightness = maxBrightness;
+                brightness = maxBrightness;
             }
         } else if (Button == "brightest") {
-            lastBrightness = maxBrightness;
+            brightness = maxBrightness;
         } else if (Button == "darkest") {
-            lastBrightness = minBrightness;
+            brightness = minBrightness;
         }
         send(Button);
         fadeColor();
-        document.getElementById("brightness").innerHTML = '<span class="Level_' + lastBrightness + '">' + lastBrightness + '</span>';
+        document.getElementById("brightness").innerHTML = '<span class="Level_' + brightness + '">' + brightness + '</span>';
     } else {
         document.getElementById("brightness").innerHTML = '<span class="Off">Off</span>';
         new Android_Toast({
