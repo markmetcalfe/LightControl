@@ -91,6 +91,16 @@ def hex():
         return "%s" % colors.get(state.color)
 
 
+@app.route("/toggle")
+def toggle():
+    state = read()
+    if state.power == power[0]:
+        write(power=power[1])
+    else:
+        write(power=power[0])
+    return 'Success', 200
+
+
 @app.route("/on")
 def on():
     write(power=power[1])
