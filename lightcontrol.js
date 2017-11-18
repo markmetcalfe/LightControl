@@ -19,60 +19,44 @@ function changeSize() {
     $("body").css("height", Math.round(fix * 100) + "%");
 }
 
-var refreshTimer = 10,
-    brightnessJS = ["darkest", "dim", "brighter", "brightest"],
-    brightnessButtonText = ["Min", "-", "+", "Max"],
-    brightness = 0,
-    colorJS = [
-        ["white", "red", "darkorange", "orange"],
-        ["amber", "yellow", "green", "lightblue"],
-        ["blue", "indigo", "purple", "pink"]
-    ],
-    colorCSS = [
-        ["White", "Red", "Dark_Orange", "Orange"],
-        ["Amber", "Yellow", "Green", "Light_Blue"],
-        ["Blue", "Indigo", "Purple", "Pink"],
-    ],
-    colorButtonText = [
-        ["", "", "", ""],
-        ["", "", "", ""],
-        ["", "", "", ""],
-    ],
-    colorText = [
-        ["White", "Red", "Dark Orange", "Orange"],
-        ["Amber", "Yellow", "Green", "Light Blue"],
-        ["Blue", "Indigo", "Purple", "Pink"],
-    ],
-    colorHex = [
-        ["#FFFFFF", "#ED1515", "#F75B07", "#F79307"],
-        ["#F7D307", "#F2EE0A", "#2AF72A", "#00DDFA"],
-        ["#0059FF", "#6C00FF", "#BF00FF", "#F200FF"],
-    ];
-
-
-window.onload = function() {
-    changeSize();
-    createButtons();
-    refresh();
-};
-
-function createButtons() {
-    for (i = 0; i < brightnessJS.length; i++) {
-        document.getElementById("brightnessButtons").innerHTML += '<a onclick="setBrightness(\'' + brightnessJS[i] + '\');return false;"><button class="mainbutton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--default">' + brightnessButtonText[i] + '</button></a>';
-    }
-    for (i = 0; i < colorJS.length; i++) {
-        for (j = 0; j < colorJS[i].length; j++) {
-            document.getElementById("colorButtons").innerHTML += '<a onclick="setColor(' + i + ',' + j + ');return false;"><button class="mainbutton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--' + colorJS[i][j] + '">' + colorButtonText[i][j] + '</button></a>';
-        }
-        document.getElementById("colorButtons").innerHTML += '<br/><br/>';
-    }
-    document.getElementById("colorButtons").innerHTML += '<br/>';
+function format(str){
+    return str.split(' ').join('').toLowerCase();
 }
 
+var refreshTimer = 10;
+
+var colorMap;
+
+var power;
+var brightness;
+var color;
+var hex;
+
+function updateColor(){
+    fadeColor(hex);
+    document.getElementById("colorstatus").innerHTML = '<span class="' + format(color) + '">' + color + '</span>';
+    refreshTimer = 10;
+}
+
+window.onload = function() {
+    $.ajax({
+        url: "data/map",
+        type: "GET",
+        cache: false,
+        success: function(returnhtml){
+            colorMap = JSON.parse(returnhtml);
+        }
+    });
+    changeSize();
+    update();
+};
+
 function send(action) {
-    xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "http://light.markmetcalfe.xyz/cmd/" + action, true);
-    xhttp.send();
+    $.ajax({
+        url: "data/" + action,
+        type: "GET",
+        cache: false
+    });
     refreshTimer = 10;
 }
 
@@ -80,44 +64,93 @@ window.setInterval(function() {
     refreshTimer--;
     if (refreshTimer < 1) {
         refreshTimer = 10;
-        refresh();
+        update();
     }
 }, 200);
 
-function refresh() {
-    updatePower();
-    updateBrightness();
-    updateColor();
+var powerButtonCreated = false;
+
+function update(){
+    $.when(
+        $.ajax({
+            url: "data/power",
+            type: "GET",
+            cache: false,
+            success: function(returnhtml){
+                if (power != returnhtml) {
+                    power = returnhtml;
+                    if (powerButtonCreated === false) {
+                        document.getElementById("powerButton").innerHTML = '<a onclick="toggle();return false;" style="padding: -5px 0px 0px 15px;"><button id="toggle" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--toggle"></button></a>';
+                        updateToggleButton(power);
+                        powerButtonCreated = true;
+                    }
+                    document.getElementById("powerstatus").innerHTML = '<span class="' + power + '">' + power + '</span>';
+                    power == "Off" ? fadeDark() : fadeColor();
+                }
+            }
+        }),
+        $.ajax({
+            url: "data/brightness",
+            type: "GET",
+            cache: false,
+            success: function(returnhtml){
+                brightness = JSON.parse(returnhtml);
+                if (power == "On") {
+                  fadeColor();
+                   document.getElementById("brightness").innerHTML = '<span class="Level_' + brightness + '">' + brightness + '</span>';
+                } else {
+                   fadeDark();
+                   document.getElementById("brightness").innerHTML = '<span class="Off">Off</span>';
+                   $(".metaColor").attr("content", "#000");
+                }
+                refreshTimer = 10;
+            }
+        }),
+        $.ajax({
+            url: "data/color",
+            type: "GET",
+            cache: false,
+            success: function(returnhtml){
+                color = returnhtml;
+                updateColor();
+            }
+        }),
+        $.ajax({
+            url: "data/hex",
+            type: "GET",
+            cache: false,
+            success: function(returnhtml){
+                hex = returnhtml;
+                updateColor();
+            }
+        })
+    ).then(draw());
 }
 
-var lastColor, lastBrightness, lastPower, lastHex;
-
 function toggle() {
-    var toggle;
-    tGet = new XMLHttpRequest();
-    tGet.onreadystatechange = function() {
-        if (tGet.readyState == 4 && tGet.status == 200) {
-            toggle = tGet.responseText;
-            refreshTimer = 10;
-            var toast2 = new Android_Toast({
-                content: "Demo Mode"
-            });
-            if (lastPower == "On") {
+    $.ajax({
+        url: "data/toggle",
+        type: "GET",
+        cache: false,
+        success: function(returnhtml){
+            if(power == "On"){
                 document.getElementById("powerstatus").innerHTML = '<span class="Off">Off</span>';
                 $(".metaColor").attr("content", "#000");
-                refresh();
                 fadeDark();
+                updateToggleButton("Off");
             } else {
                 document.getElementById("powerstatus").innerHTML = '<span class="On">On</span>';
-                $(".metaColor").attr("content", lastHex);
-                refresh();
+                $(".metaColor").attr("content", hex);
                 fadeColor();
+                updateToggleButton("On");
             }
+            new Android_Toast({
+                content: "Demo Mode"
+            });
             refreshTimer = 10;
+            update();
         }
-    };
-    tGet.open("GET", "http://light.markmetcalfe.xyz/cmd/toggle", true);
-    tGet.send();
+    });
 }
 
 function updateToggleButton(p) {
@@ -181,9 +214,10 @@ function fadeDark() {
 }
 
 function fadeColor() {
+    $(".metaColor").attr("content", colorHex[i][j]);
     updateToggleButton(lastPower);
-    if (lastHex === null || lastBrightness === null) {} else {
-        var lightColor = blendColors(lastHex, "#FFFFFF", 0.75);
+    if (hex === null || brightness === null) {} else {
+        var lightColor = blendColors(hex, "#FFFFFF", 0.75);
         var fadeColor = blendColors("#000000", lightColor, 0.6 + (lastBrightness * 0.08));
         $('body').animate({
             backgroundColor: fadeColor
@@ -200,17 +234,17 @@ function fadeColor() {
     }
 }
 
-function setColor(i, j) {
+function setColor(color) {
     refreshTimer = 10;
-    if (lastPower == "On") {
-        send(colorJS[i][j]);
-        document.getElementById("colorstatus").innerHTML = '<span class="' + colorCSS[i][j] + '">' + colorText[i][j] + '</span>';
-        $(".metaColor").attr("content", colorHex[i][j]);
-        lastHex = colorHex[i][j];
+    if (power == "On") {
+        send('setcolor/'+color);
+        hex = colorMap.get(color);
+        document.getElementById("colorstatus").innerHTML = '<span class="' + format(color) + '">' + color + '</span>';
+        $(".metaColor").attr("content", hex);
         fadeColor();
     } else {
         document.getElementById("colorstatus").innerHTML = '<span class="Off">Off</span>';
-        var toast1 = new Android_Toast({
+        new Android_Toast({
             content: "Light Isn't On"
         });
         $(".metaColor").attr("content", "#000");
@@ -219,7 +253,7 @@ function setColor(i, j) {
 
 function setBrightness(Button) {
     refreshTimer = 10;
-    if (lastPower == "On") {
+    if (power == "On") {
         if (Button == "dim") {
             if (lastBrightness > 1) {
                 lastBrightness--;
@@ -242,90 +276,9 @@ function setBrightness(Button) {
         document.getElementById("brightness").innerHTML = '<span class="Level_' + lastBrightness + '">' + lastBrightness + '</span>';
     } else {
         document.getElementById("brightness").innerHTML = '<span class="Off">Off</span>';
-        var toast1 = new Android_Toast({
+        new Android_Toast({
             content: "Light Isn't On"
         });
         $(".metaColor").attr("content", "#000");
     }
-}
-
-function updateColor() {
-    var color;
-    cGet = new XMLHttpRequest();
-    cGet.onreadystatechange = function() {
-        if (cGet.readyState == 4 && cGet.status == 200) {
-            color = cGet.responseText;
-            for (i = 0; i < colorCSS.length; i++) {
-                for (j = 0; j < colorCSS[i].length; j++) {
-                    if (color == colorCSS[i][j]) {
-                        if (lastColor != color) {
-                            lastColor = color;
-                            lastHex = colorHex[i][j];
-                            refreshTimer = 10;
-                        }
-                        if (lastPower == "On") {
-                            fadeColor();
-                            document.getElementById("colorstatus").innerHTML = '<span class="' + colorCSS[i][j] + '">' + colorText[i][j] + '</span>';
-                            $(".metaColor").attr("content", colorHex[i][j]);
-                        } else {
-                            fadeDark();
-                            document.getElementById("colorstatus").innerHTML = '<span class="Off">Off</span>';
-                            $(".metaColor").attr("content", "#000");
-                        }
-                    }
-                }
-            }
-        }
-    };
-    cGet.open("GET", "http://light.markmetcalfe.xyz/cmd/getcolor", true);
-    cGet.send();
-}
-
-function updateBrightness() {
-    var brightness;
-    bGet = new XMLHttpRequest();
-    bGet.onreadystatechange = function() {
-        if (bGet.readyState == 4 && bGet.status == 200) {
-            brightness = bGet.responseText;
-            if (brightness > 0 && brightness < 6) {
-                lastBrightness = brightness;
-            }
-            if (lastPower == "On") {
-                fadeColor();
-                document.getElementById("brightness").innerHTML = '<span class="Level_' + brightness + '">' + brightness + '</span>';
-            } else {
-                fadeDark();
-                document.getElementById("brightness").innerHTML = '<span class="Off">Off</span>';
-                $(".metaColor").attr("content", "#000");
-            }
-            refreshTimer = 10;
-        }
-    };
-    bGet.open("GET", "http://light.markmetcalfe.xyz/cmd/getbrightness", true);
-    bGet.send();
-}
-
-var powerButtonCreated = false;
-
-function updatePower() {
-    var power;
-    pGet = new XMLHttpRequest();
-    pGet.onreadystatechange = function() {
-        if (pGet.readyState == 4 && pGet.status == 200) {
-            power = pGet.responseText;
-            if (power != lastPower) {
-                lastPower = power;
-                if (powerButtonCreated === false) {
-                    document.getElementById("powerButton").innerHTML = '<a onclick="toggle();return false;" style="padding: -5px 0px 0px 15px;"><button id="toggle" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--toggle"></button></a>';
-                    updateToggleButton(power);
-                }
-                document.getElementById("powerstatus").innerHTML = '<span class="' + power + '">' + power + '</span>';
-                updateColor();
-                updateBrightness();
-                power == "Off" ? fadeDark() : fadeColor();
-            }
-        }
-    };
-    pGet.open("GET", "http://light.markmetcalfe.xyz/cmd/getpower", true);
-    pGet.send();
 }
