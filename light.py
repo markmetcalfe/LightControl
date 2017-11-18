@@ -1,5 +1,3 @@
-import subprocess
-import urllib
 import json
 import os
 import pickle
@@ -29,7 +27,7 @@ colors = {
     "Purple": "#BF00FF",
     "Pink": "#F200FF"
 }
-minBrightness = 0
+minBrightness = 1
 maxBrightness = 5
 
 
@@ -62,6 +60,7 @@ def write(power=None, brightness=None, color=None):
 @app.route("/map")
 def map():
     return json.dumps(colors, sort_keys=True, indent=4, separators=(',', ': '))
+
 
 @app.route("/hour")
 def hour():
