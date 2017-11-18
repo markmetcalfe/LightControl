@@ -3,6 +3,7 @@ import os
 import pickle
 from datetime import datetime
 from flask import Flask
+from state import State
 
 app = Flask(__name__)
 
@@ -29,13 +30,6 @@ colors = {
 }
 minBrightness = 1
 maxBrightness = 5
-
-
-class State:
-    def __init__(self, power, brightness, color):
-        self.power = power
-        self.brightness = brightness
-        self.color = color
 
 
 def url(string):
