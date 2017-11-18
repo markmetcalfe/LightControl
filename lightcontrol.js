@@ -19,7 +19,7 @@ function changeSize() {
     $("body").css("height", Math.round(fix * 100) + "%");
 }
 
-function format(str){
+function format(str) {
     return str.split(' ').join('').toLowerCase();
 }
 
@@ -27,12 +27,15 @@ var refreshTimer = 10;
 
 var colorMap;
 
+var minBrightness = 1;
+var maxBrightness = 5;
+
 var power;
 var brightness;
 var color;
 var hex;
 
-function updateColor(){
+function updateColor() {
     fadeColor(hex);
     document.getElementById("colorstatus").innerHTML = '<span class="' + format(color) + '">' + color + '</span>';
     refreshTimer = 10;
@@ -43,7 +46,7 @@ window.onload = function() {
         url: "data/map",
         type: "GET",
         cache: false,
-        success: function(returnhtml){
+        success: function(returnhtml) {
             colorMap = JSON.parse(returnhtml);
         }
     });
@@ -70,13 +73,13 @@ window.setInterval(function() {
 
 var powerButtonCreated = false;
 
-function update(){
+function update() {
     $.when(
         $.ajax({
             url: "data/power",
             type: "GET",
             cache: false,
-            success: function(returnhtml){
+            success: function(returnhtml) {
                 if (power != returnhtml) {
                     power = returnhtml;
                     if (powerButtonCreated === false) {
@@ -93,15 +96,15 @@ function update(){
             url: "data/brightness",
             type: "GET",
             cache: false,
-            success: function(returnhtml){
+            success: function(returnhtml) {
                 brightness = JSON.parse(returnhtml);
                 if (power == "On") {
-                  fadeColor();
-                   document.getElementById("brightness").innerHTML = '<span class="Level_' + brightness + '">' + brightness + '</span>';
+                    fadeColor();
+                    document.getElementById("brightness").innerHTML = '<span class="Level_' + brightness + '">' + brightness + '</span>';
                 } else {
-                   fadeDark();
-                   document.getElementById("brightness").innerHTML = '<span class="Off">Off</span>';
-                   $(".metaColor").attr("content", "#000");
+                    fadeDark();
+                    document.getElementById("brightness").innerHTML = '<span class="Off">Off</span>';
+                    $(".metaColor").attr("content", "#000");
                 }
                 refreshTimer = 10;
             }
@@ -110,7 +113,7 @@ function update(){
             url: "data/color",
             type: "GET",
             cache: false,
-            success: function(returnhtml){
+            success: function(returnhtml) {
                 color = returnhtml;
                 updateColor();
             }
@@ -119,7 +122,7 @@ function update(){
             url: "data/hex",
             type: "GET",
             cache: false,
-            success: function(returnhtml){
+            success: function(returnhtml) {
                 hex = returnhtml;
                 updateColor();
             }
@@ -132,8 +135,8 @@ function toggle() {
         url: "data/toggle",
         type: "GET",
         cache: false,
-        success: function(returnhtml){
-            if(power == "On"){
+        success: function(returnhtml) {
+            if (power == "On") {
                 document.getElementById("powerstatus").innerHTML = '<span class="Off">Off</span>';
                 $(".metaColor").attr("content", "#000");
                 fadeDark();
@@ -198,7 +201,7 @@ function updateToggleButton(p) {
 }
 
 function fadeDark() {
-    updateToggleButton(lastPower);
+    updateToggleButton(power);
     $('body').animate({
         backgroundColor: '#1A1A1A'
     }, {
@@ -214,9 +217,10 @@ function fadeDark() {
 }
 
 function fadeColor() {
-    $(".metaColor").attr("content", colorHex[i][j]);
     updateToggleButton(lastPower);
     if (hex === null || brightness === null) {} else {
+        hex = colorMap.get(color)
+        $(".metaColor").attr("content", hex);
         var lightColor = blendColors(hex, "#FFFFFF", 0.75);
         var fadeColor = blendColors("#000000", lightColor, 0.6 + (lastBrightness * 0.08));
         $('body').animate({
@@ -237,7 +241,7 @@ function fadeColor() {
 function setColor(color) {
     refreshTimer = 10;
     if (power == "On") {
-        send('setcolor/'+color);
+        send('setcolor/' + color);
         hex = colorMap.get(color);
         document.getElementById("colorstatus").innerHTML = '<span class="' + format(color) + '">' + color + '</span>';
         $(".metaColor").attr("content", hex);
@@ -255,21 +259,21 @@ function setBrightness(Button) {
     refreshTimer = 10;
     if (power == "On") {
         if (Button == "dim") {
-            if (lastBrightness > 1) {
+            if (lastBrightness > minBrightness) {
                 lastBrightness--;
             } else {
-                lastBrightness = 1;
+                lastBrightness = minBrightness;
             }
         } else if (Button == "brighter") {
-            if (lastBrightness < 5) {
+            if (lastBrightness < maxBrightness) {
                 lastBrightness++;
             } else {
-                lastBrightness = 5;
+                lastBrightness = maxBrightness;
             }
         } else if (Button == "brightest") {
-            lastBrightness = 5;
+            lastBrightness = maxBrightness;
         } else if (Button == "darkest") {
-            lastBrightness = 1;
+            lastBrightness = minBrightness;
         }
         send(Button);
         fadeColor();
