@@ -1,10 +1,10 @@
-(i__main__
+(istate
 State
 p0
 (dp1
 S'color'
 p2
-S'Blue'
+S'Red'
 p3
 sS'power'
 p4
@@ -12,5 +12,5 @@ S'On'
 p5
 sS'brightness'
 p6
-I0
+I5
 sb.
