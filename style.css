@@ -29,7 +29,12 @@
     margin: auto;
 }
 
+html {
+    height: 100%;
+}
+
 body {
+    height: 100%;
 	text-align: center;
 	background-color: #FFFFFF;
 	color: #000000;
@@ -38,7 +43,6 @@ body {
 
 #container {
 	top: 50%;
-	transform: translateY(-50%);
 	height: 100%;
 }
 
@@ -100,57 +104,4 @@ span {
 
 .Level_1 {
 	color:#4d4d00;
-}
-
-.white {
-	text-shadow: 0 0 3px #000;
-	color:#fff;
-}
-
-.red {
-	color:#ED1515;
-}
-
-.darkorange {
-	color:#F75B07;
-}
-
-.orange {
-	color:#F79307;
-}
-
-.amber {
-	color:#F7D307;
-}
-
-.yellow {
-	color:#F2EE0A;
-}
-
-.lightgreen {
-	color:#00FA7D;
-}
-
-.green {
-	color:#2AF72A;
-}
-
-.lightblue {
-	color:#00DDFA;
-}
-
-.blue {
-	color:#0059FF;
-}
-
-.indigo {
-	color:#8400FF;
-}
-
-.purple {
-	color:#BF00FF;
-}
-
-.pink {
-	color:#F200FF;
 }
