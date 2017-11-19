@@ -15,7 +15,10 @@ function blendColors(c0, c1, p) {
 
 function changeSize() {
     var fix = ($(window).height() / $(document).height());
-    $("body").css("height", Math.round(fix * 100) + "%");
+    $(".container").css("height", Math.round(fix * 100) + "%");
+    $(".container").css("zoom", "0.5");
+    $(".container").css("-moz-transform", "scale(0.5)");
+    $(".container").css("transform", "scale(0.5)");
 }
 
 function format(str) {
