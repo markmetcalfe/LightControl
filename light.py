@@ -6,7 +6,7 @@ from flask import Flask
 
 app = Flask(__name__)
 
-path = os.path.dirname(os.path.realpath(__file__))+'/state.data'
+path = os.path.dirname(os.path.realpath(__file__))
 
 startTime = 12
 endTime = 17
@@ -43,7 +43,7 @@ def url(string):
 
 
 def read():
-    return pickle.load(open(path, 'rb'))
+    return pickle.load(open(os.path.dirname(os.path.realpath(__file__)) + '/state.data', 'rb'))
 
 
 def write(power=None, brightness=None, color=None):
@@ -54,13 +54,7 @@ def write(power=None, brightness=None, color=None):
         new.brightness = brightness
     if color is not None:
         new.color = color
-    pickle.dump(new, open(path, 'wb'))
-
-
-@app.route("/init")
-def init():
-    pickle.dump(State("On", 5, "Red"), open(path, 'wb'))
-    return 'Done'
+    pickle.dump(new, open(os.path.dirname(os.path.realpath(__file__)) + '/state.data', 'wb'))
 
 
 @app.route("/map")
@@ -85,20 +79,12 @@ def brightness():
 
 @app.route("/color")
 def color():
-    state = read()
-    if state.power == power[0]:
-        return power[0]
-    else:
-        return "%s" % read().color
+    return "%s" % read().color
 
 
 @app.route("/hex")
 def hex():
-    state = read()
-    if state.power == power[0]:
-        return "#000000"
-    else:
-        return "%s" % colors.get(state.color)
+    return "%s" % colors.get(read().color)
 
 
 @app.route("/toggle")
