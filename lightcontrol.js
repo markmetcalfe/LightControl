@@ -45,6 +45,8 @@ function updateColor() {
 }
 
 window.onload = function() {
+    $('#loading').show();
+    $('#content').hide();
     $.ajax({
         url: "data/map",
         type: "GET",
@@ -76,6 +78,7 @@ window.setInterval(function() {
 var powerButtonCreated = false;
 
 function update() {
+    $.when(
     $.ajax({
         url: "data/power",
         type: "GET",
@@ -92,7 +95,7 @@ function update() {
                 power == "Off" ? fadeDark() : fadeColor();
             }
         }
-    });
+    }), 
     $.ajax({
         url: "data/brightness",
         type: "GET",
@@ -109,7 +112,7 @@ function update() {
             }
             refreshTimer = 10;
         }
-    });
+    }), 
     $.ajax({
         url: "data/color",
         type: "GET",
@@ -118,7 +121,7 @@ function update() {
             color = returnhtml;
             updateColor();
         }
-    });
+    }), 
     $.ajax({
         url: "data/hex",
         type: "GET",
@@ -127,6 +130,9 @@ function update() {
             hex = returnhtml;
             updateColor();
         }
+    })).done(function(a1, a2, a3, a4){
+        $('#loading').hide();
+        $('#content').show();
     });
     changeSize();
 }
