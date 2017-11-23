@@ -13,7 +13,6 @@
     background-color: rgb(255,255,255);
     -webkit-transition: all .5s ease;
     z-index: 1000;
-    display:none;
 }
 
 #loadingimage {
