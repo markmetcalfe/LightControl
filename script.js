@@ -1,18 +1,17 @@
 var minBrightness = 1;
 var maxBrightness = 5;
 
+var timer;
 var colorMap;
 var on;
 var brightness;
 var color;
 
 window.onload = function() {
-    $('#loading').show();
-    $('#content').hide();
     $.ajax({ url: "data/map", type: "GET", cache: false }).done(function(data){
        colorMap = $.parseJSON(data);
        sync();
-       window.setInterval(sync, 1000);
+       timer = new Timer();
     });
 };
 
@@ -32,17 +31,20 @@ function sync() {
             powerOn();
         } else powerOff();
         
-        $('#loading').hide();
-        $('#content').show();
+        $('#loading').css("display","none");
+        $('#container').css("display","");
     });
 }
 
 function setColor(newcolor) {
+    timer.stop();
     if(lightOn()){
         $.ajax({ url: "data/setcolor/"+newcolor, type: "GET", cache: false });
         
         color = newcolor;
         updateColor(color, colorMap[color]);
+        
+        timer.start();
     }
 }
 
@@ -54,6 +56,7 @@ function updateColor(color, hex) {
 
 function setBrightness(Button) {
     if(lightOn()){
+        timer.stop();
         if(Button == "dim") brightness = brightness>minBrightness ? brightness-1 : minBrightness;
         else if(Button == "brighter") brightness = brightness<maxBrightness ? brightness+1 : maxBrightness;
         else if(Button == "brightest") brightness = maxBrightness;
@@ -62,6 +65,7 @@ function setBrightness(Button) {
         $.ajax({ url: "data/"+Button, type: "GET", cache: false });
         
         updateBrightness(brightness);
+        timer.start();
     }
 }
 
@@ -71,6 +75,7 @@ function updateBrightness(brightness) {
 }
 
 function toggle(){ 
+    timer.stop();
     $.ajax({
         url: "data/"+(on ? "off" : "on"),
         type: "GET",
@@ -79,6 +84,7 @@ function toggle(){
             on ? powerOff() : powerOn();
             new Android_Toast({ content: "Demo Mode" });
             sync();
+            timer.start();
         }
     });
 }
@@ -109,11 +115,13 @@ function powerOn(){
 }
 
 function fadeDark() {
+    timer.stop();
     $('body').animate({
         backgroundColor: '#1A1A1A'
     }, {
         duration: 2000,
-        queue: false
+        queue: false,
+        complete: timer.start()
     });
     $('body').animate({
         color: '#FFFFFF'
@@ -124,13 +132,15 @@ function fadeDark() {
 }
 
 function fadeColor(hex) {
+    timer.stop();
     var lightColor = blendColors(hex, "#FFFFFF", 0.75);
     var fadeColor = blendColors("#000000", lightColor, 0.6 + (brightness * 0.08));
     $('body').animate({
         backgroundColor: fadeColor
     }, {
         duration: 2000,
-        queue: false
+        queue: false,
+        complete: timer.start()
     });
     $('body').animate({
         color: '#000000'
@@ -148,6 +158,24 @@ function lightOn(){
     return on;
 }
 
+
+function Timer() {
+    var timerObj = setInterval(sync, 1000);
+    this.stop = function() {
+        if (timerObj) {
+            clearInterval(timerObj);
+            timerObj = null;
+        }
+        return this;
+    }
+    this.start = function() {
+        if (!timerObj) {
+            this.stop();
+            timerObj = setInterval(sync, 1000);
+        }
+        return this;
+    }
+}
 
 /* 
  * Taken from http://stackoverflow.com/posts/13542669/revisions
