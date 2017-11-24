@@ -3,15 +3,16 @@ var maxBrightness = 5;
 
 var timer;
 var colorMap;
-var on;
+
+var powerIsOn;
 var brightness;
 var color;
 
 window.onload = function() {
     $.ajax({ url: "data/map", type: "GET", cache: false }).done(function(data){
        colorMap = $.parseJSON(data);
-       sync();
        timer = new Timer();
+       sync();
     });
 };
 
@@ -21,30 +22,35 @@ function sync() {
         $.ajax({ url: "data/brightness", type: "GET", cache: false }), 
         $.ajax({ url: "data/color",      type: "GET", cache: false })
     ).done(function(a1, a2, a3){
-        on = a1[0] == "On";
-        brightness = $.parseJSON(a2[0]);
-        color = a3[0];
-        
-        if(on){
-            updateColor(color, colorMap[color]);
-            updateBrightness(brightness);
-            powerOn();
-        } else powerOff();
-        
-        $('#loading').css("display","none");
-        $('#container').css("display","");
+        if((a1[0]=="On")!==powerIsOn||$.parseJSON(a2[0])!=brightness||a3[0]!=color)
+            update(a1[0]=="On",$.parseJSON(a2[0]),a3[0]);
     });
 }
 
+function update(p,b,c) {
+    powerIsOn = p;
+    brightness = b;
+    color = c;
+    
+    timer.wait();
+    
+    if(powerIsOn){
+        updateColor(color, colorMap[color]);
+        updateBrightness(brightness);
+        turnOn();
+    } else turnOff();
+    
+    $('#loading').css("display","none");
+    $('#container').css("display","");
+}
+
 function setColor(newcolor) {
-    timer.stop();
+    timer.wait();
     if(lightOn()){
         $.ajax({ url: "data/setcolor/"+newcolor, type: "GET", cache: false });
         
         color = newcolor;
         updateColor(color, colorMap[color]);
-        
-        timer.start();
     }
 }
 
@@ -55,17 +61,16 @@ function updateColor(color, hex) {
 }
 
 function setBrightness(Button) {
+    timer.wait();
     if(lightOn()){
-        timer.stop();
-        if(Button == "dim") brightness = brightness>minBrightness ? brightness-1 : minBrightness;
-        else if(Button == "brighter") brightness = brightness<maxBrightness ? brightness+1 : maxBrightness;
+        if(Button == "dim")            brightness = brightness>minBrightness ? brightness-1 : minBrightness;
+        else if(Button == "brighter")  brightness = brightness<maxBrightness ? brightness+1 : maxBrightness;
         else if(Button == "brightest") brightness = maxBrightness;
-        else if(Button == "darkest") brightness = minBrightness;
+        else if(Button == "darkest")   brightness = minBrightness;
         
         $.ajax({ url: "data/"+Button, type: "GET", cache: false });
         
         updateBrightness(brightness);
-        timer.start();
     }
 }
 
@@ -75,47 +80,56 @@ function updateBrightness(brightness) {
 }
 
 function toggle(){ 
-    timer.stop();
     $.ajax({
-        url: "data/"+(on ? "off" : "on"),
+        url: "data/"+(powerIsOn?"off":"on"),
         type: "GET",
         cache: false,
         success: function(returnhtml) {
-            on ? powerOff() : powerOn();
+            timer.wait();
+            powerIsOn ? turnOff() : turnOn();
             new Android_Toast({ content: "Demo Mode" });
             sync();
-            timer.start();
         }
     });
 }
 
-function powerOff(){
-    on = false;
+function turnOff(){
+    powerIsOn = false;
     fadeDark();
+    
     var off = '<span class="Off">Off</span>';
+    
     document.getElementById("toggle").innerHTML = "On";
     document.getElementById("powerstatus").innerHTML = off;
+    
     document.getElementById("brightness").innerHTML = off;
     document.getElementById("colorstatus").innerHTML = off;
+    
     $('#toggle').animate({ backgroundColor: 'green' }, { duration: 300, queue: false });
     $('#toggle').animate({ color: 'green' }, { duration: 100, queue: false });
     $('#toggle').animate({ color: '#fff' }, { duration: 100, queue: false });
+    
     $(".metaColor").attr("content", "#000");
 }
 
-function powerOn(){
-    on = true;
+function turnOn(){
+    powerIsOn = true;
     fadeColor(colorMap[color]);
+    
     document.getElementById("powerstatus").innerHTML = '<span class="On">On</span>';
     document.getElementById("toggle").innerHTML = "Off";
+    
+    updateBrightness(brightness);
+    updateColor(color, colorMap[color]);
+    
     $('#toggle').animate({ backgroundColor: 'red' }, { duration: 300, queue: false });
     $('#toggle').animate({ color: 'red' }, { duration: 100, queue: false });
     $('#toggle').animate({ color: '#fff' }, { duration: 100, queue: false });
+    
     $(".metaColor").attr("content", colorMap[color]);
 }
 
 function fadeDark() {
-    timer.stop();
     $('body').animate({
         backgroundColor: '#1A1A1A'
     }, {
@@ -132,9 +146,8 @@ function fadeDark() {
 }
 
 function fadeColor(hex) {
-    timer.stop();
     var lightColor = blendColors(hex, "#FFFFFF", 0.75);
-    var fadeColor = blendColors("#000000", lightColor, 0.6 + (brightness * 0.08));
+    var fadeColor = blendColors("#000000", lightColor, 0.5 + (brightness * 0.1));
     $('body').animate({
         backgroundColor: fadeColor
     }, {
@@ -151,11 +164,11 @@ function fadeColor(hex) {
 }
 
 function lightOn(){
-    if(!on){
-        powerOff();
+    if(!powerIsOn){
+        turnOff();
         new Android_Toast({ content: "Light Isn't On" });
     }
-    return on;
+    return powerIsOn;
 }
 
 
@@ -174,6 +187,13 @@ function Timer() {
             timerObj = setInterval(sync, 1000);
         }
         return this;
+    }
+    this.wait = function() {
+        timer.stop();
+        setTimeout(function(){
+            sync();
+            timer.start();
+        }, 3000);
     }
 }
 
