@@ -14,7 +14,22 @@ window.onload = function() {
        timer = new Timer();
        sync();
     });
+    $(window).resize();
 };
+
+
+$(window).resize(function resize_viewport(){
+    var h = $(window).height();
+    var w = $(window).width();
+    var scale = 1.0;
+    if(w>h){
+        scale = h/587.2;
+    } else {
+        scale = 1;
+    }
+    $('#container').css('transform', 'scale('+scale+')');
+});
+
 
 function sync() {
     $.when(
@@ -143,6 +158,9 @@ function fadeDark() {
         duration: 2000,
         queue: false
     });
+    window.setTimeout(function(){
+        $(".metaColor").attr("content", "#000");
+    }, 1000);
 }
 
 function fadeColor(hex) {
@@ -161,6 +179,9 @@ function fadeColor(hex) {
         duration: 2000,
         queue: false
     });
+    window.setTimeout(function(){
+        $(".metaColor").attr("content", fadeColor);
+    }, 1000);
 }
 
 function lightOn(){
