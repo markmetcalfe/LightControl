@@ -1,7 +1,8 @@
-@viewport {
-    height: device-height;
-    min-zoom: 0.5;
-    max-zoom: 5;
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    text-align: center;
 }
 
 #loading {
@@ -28,35 +29,18 @@
     margin: auto;
 }
 
-html {
-    height: 100%;
-}
-
-body {
-    height: 100%;
-	text-align: center;
-	background-color: #FFFFFF;
-	color: #000000;
-	position: relative;
-}
-
 #container {
-	top: 50%;
-	height: 100%;
-}
-
-::-webkit-scrollbar { 
-    display: none; 
+    font-family: 'Roboto', sans-serif;
+    transform-origin: 50% 0;
+    margin: 0 auto;
 }
 
 h1 {
-	font-family: 'Roboto', sans-serif;
 	font-size: 4em;
 	font-weight: 500;
 }
 
 h2 {
-	font-family: 'Roboto', sans-serif;
 	font-size: 2.5em;
 	font-weight: 300;
 }
