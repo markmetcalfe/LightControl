@@ -1,6 +1,6 @@
 # LightControl
 My Raspberry Pi Light Controller
 
-http://light.markmetcalfe.info/
+https://light.markmetcalfe.io/
 
-More info: http://markmetcalfe.info/
+More info: https://markmetcalfe.io/
