@@ -179,9 +179,10 @@ function fadeColor(hex) {
         duration: 2000,
         queue: false
     });
-    window.setTimeout(function(){
-        $(".metaColor").attr("content", fadeColor);
-    }, 1000);
+    $(".metaColor").attr("content", hex);
+    //window.setTimeout(function(){
+    //    $(".metaColor").attr("content", hex);
+    //}, 1000);
 }
 
 function lightOn(){
