@@ -24,7 +24,7 @@ const error_codes = [
 ];
 let error = 0;
 
-const timer_schedule = schedule.scheduleJob('0 * * * *', function(){ setPower(timer()); } );
+const timer_schedule = schedule.scheduleJob('0 * * * *', function(){ setPower(timer()?"On":"Off"); } );
 
 function getState(){
     return {

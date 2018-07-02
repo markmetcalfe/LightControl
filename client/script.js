@@ -1,6 +1,6 @@
 let colorMap, minBrightness, maxBrightness, powerIsOn, brightness, color, hex;
 
-let socket = io.connect();
+let socket = io.connect({path:window.location.pathname+'socket.io'});
 socket.on('connect', function(data) {
    socket.emit('join');
 });
