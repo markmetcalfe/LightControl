@@ -1,0 +1,25 @@
+{
+  "name": "lightcontrol",
+  "version": "1.0.0",
+  "description": "Raspberry-pi powered light controller",
+  "main": "lightcontrol.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/markmetcalfe/LightControl.git"
+  },
+  "author": "Mark Metcalfe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/markmetcalfe/LightControl/issues"
+  },
+  "homepage": "https://github.com/markmetcalfe/LightControl#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "node-schedule": "^1.3.0",
+    "socket.io": "^2.1.1",
+    "sun-time": "^1.0.2"
+  }
+}
