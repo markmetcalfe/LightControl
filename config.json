@@ -15,9 +15,9 @@
         "Indigo": "#8400FF",
         "Purple": "#BF00FF",
         "Pink": "#F200FF",
-        "DEFAULT": "White"
+        "DEFAULT": "Pink"
     },
-    "timer": true,
+    "timer": false,
     "location": [
         -41.3228,
         174.7762

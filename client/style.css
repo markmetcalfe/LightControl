@@ -5,28 +5,15 @@ html, body {
     text-align: center;
 }
 
-#loading {
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background-color: rgb(255,255,255);
-    -webkit-transition: all .5s ease;
-    z-index: 1000;
+body {
+    -moz-transition: background-color 2s, color 2s;
+    -webkit-transition: background-color 2s, color 2s;
+    transition: background-color 2s, color 2s;
 }
 
-#loadingimage {
-    max-height: 100%;  
-    max-width: 100%; 
-    width: auto;
-    height: auto;
-    position: absolute;  
-    top: 0;  
-    bottom: 0;  
-    left: 0;  
-    right: 0;  
-    margin: auto;
+body.dark {
+    background-color: #1A1A1A; 
+    color: #fff;
 }
 
 #container {
@@ -63,6 +50,20 @@ span {
 
 .On {
 	color: green;
+}
+
+#toggle {
+    -moz-transition: background-color 1s;
+    -webkit-transition: background-color 1s;
+    transition: background-color 1s;
+}
+
+#toggle.Off {
+    background: red !important;
+}
+
+#toggle.On {
+    background: green !important;
 }
 
 .Off {

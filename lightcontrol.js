@@ -12,7 +12,7 @@ const config = require('./config.json');
 
 const power = ["Off", "On"];
 
-let power_on = false;
+let power_on = true;
 let current_brightness = config.max_brightness;
 let current_color = config.colors.DEFAULT;
 
@@ -24,7 +24,7 @@ const error_codes = [
 ];
 let error = 0;
 
-const timer_schedule = schedule.scheduleJob('0 * * * *', setPower(timer()) );
+const timer_schedule = schedule.scheduleJob('0 * * * *', function(){ setPower(timer()); } );
 
 function getState(){
     return {
@@ -86,15 +86,6 @@ function setColor(state){
     } else
         error = 1;
 }
-
-app.get('/set', (req, res) => {
-    if(timer()){
-        if(req.query.power)      setPower(req.query.power);
-        if(req.query.brightness) setBrightness(req.query.brightness);
-        if(req.query.color)      setColor(req.query.color);
-    }
-    res.json(getState());
-});
 
 io.on('connection', function(client) { 
     client.on('join', function() {
