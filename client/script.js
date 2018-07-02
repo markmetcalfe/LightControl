@@ -18,6 +18,17 @@ window.onload = function() {
 };
 
 
+var socket = io.connect('http://localhost:8002/');
+socket.on('connect', function(data) {
+   socket.emit('join');
+   socket.emit('update', {
+    "ayy": "lmao"
+    });
+});
+socket.on('state', function(data) {
+   console.log(data);
+});
+
 $(window).resize(function resize_viewport(){
     var h = $(window).height();
     var w = $(window).width();
@@ -60,6 +71,11 @@ function update(p,b,c) {
 }
 
 function setColor(newcolor) {
+
+    socket.emit('update', {
+        "ayy": "lmao"
+    });
+
     timer.wait();
     if(lightOn()){
         $.ajax({ url: "data/setcolor/"+newcolor, type: "GET", cache: false });

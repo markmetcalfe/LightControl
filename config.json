@@ -1,0 +1,27 @@
+{
+    "min_brightness": 1,
+    "max_brightness": 5,
+    "colors": {
+        "White": "#FFFFFF",
+        "Red": "#ED1515",
+        "Dark Orange": "#F75B07",
+        "Orange": "#F79307",
+        "Amber": "#F7D307",
+        "Yellow": "#F2EE0A",
+        "Green": "#2AF72A",
+        "Light Green": "#00FA7D",
+        "Light Blue": "#00DDFA",
+        "Blue": "#0059FF",
+        "Indigo": "#8400FF",
+        "Purple": "#BF00FF",
+        "Pink": "#F200FF",
+        "DEFAULT": "White"
+    },
+    "timer": true,
+    "location": [
+        -41.3228,
+        174.7762
+    ],
+    "earliest_time": 11,
+    "latest_time": 17
+}
