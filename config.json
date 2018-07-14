@@ -33,6 +33,5 @@
         "Strobe": "change_strobe",
         "Fade": "change_fade",
         "Smooth": "change_smooth"
-    },
-    "gpio_pin": 21
+    }
 }
