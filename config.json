@@ -21,5 +21,5 @@
     ],
     "earliest_time": 11,
     "latest_time": 17,
-    "command_url": "/light/command/"
+    "command_url": "https://markmetcalfe.io/light/command/"
 }
