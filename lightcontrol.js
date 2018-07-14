@@ -1,5 +1,6 @@
 const path = require('path');
 const express = require('express');
+const request = require('request');
 const sun = require('sun-time');
 const schedule = require('node-schedule');
 const app = express();
@@ -61,12 +62,36 @@ function timer(){
     return true;
 }
 
+function sendCommand(command){
+    request({
+        uri: config.command_url,
+        body: JSON.stringify({ "command": command }),
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+}
+
 function setPower(state){
+    sendCommand(state);
     power_on = state === power[1];
 }
 
 function setBrightness(state){
     if(power_on){
+        if(state < config.min_brightness)
+            state = config.min_brightness;
+        else if(state > config.max_brightness)
+            state = config.max_brightness;
+        
+        let delta = state - current_brightness;
+        if(delta>0){
+            for(let i=0; i<delta; i++) sendCommand("Up");
+        } else if(delta<0){
+            for(let i=0; i<(-delta); i++) sendCommand("Down");
+        }
+
         if(state >= config.min_brightness && state <= config.max_brightness)
             current_brightness = state;
         else if(state < config.min_brightness)
@@ -79,9 +104,10 @@ function setBrightness(state){
 
 function setColor(state){
     if(power_on){
-        if(config.colors.hasOwnProperty(state))
+        if(config.colors.hasOwnProperty(state)){
+            sendCommand(state);
             current_color = state;
-        else
+        } else
             error = 3;
     } else
         error = 1;
