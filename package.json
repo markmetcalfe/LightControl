@@ -4,6 +4,7 @@
   "description": "Raspberry-pi powered light controller",
   "main": "lightcontrol.js",
   "scripts": {
+    "start": "nodemon lightcontrol.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

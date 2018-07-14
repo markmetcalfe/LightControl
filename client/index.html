@@ -23,28 +23,19 @@
 <body>
     <div id="container">
         <h1>Light Control</h1>
-        <h2>Power: <span id="powerstatus"></span><span id="powerButton"><a onclick="toggle();return false;" style="padding: -5px 0px 0px 15px;"><button id="toggle" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--toggle"></button></a></span></h2>
-        <h2>Brightness: <span id="brightness"></span></h2>
-        <div id="brightnessButtons">
-            <a onclick="setBrightness('darkest');return false;">
-                <button class="mainbutton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--default" data-upgraded=",MaterialButton,MaterialRipple">Min<span class="mdl-button__ripple-container"><span class="mdl-ripple"></span></span>
+        <h2>Power: <span id="powerstatus"></span><span id="powerButton">
+            <a onclick="toggle();return false;" style="padding: -5px 0px 0px 15px;">
+                <button id="toggle" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--toggle">
                 </button>
             </a>
+        </span></h2>
+        <h2>Brightness: <span id="brightness"></span></h2>
+        <h2>Colour: <span id="colorstatus"></span></h2>
+        <div id="colorButtons">
             <a onclick="setBrightness('dim');return false;">
                 <button class="mainbutton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--default" data-upgraded=",MaterialButton,MaterialRipple">-<span class="mdl-button__ripple-container"><span class="mdl-ripple"></span></span>
                 </button>
             </a>
-            <a onclick="setBrightness('brighter');return false;">
-                <button class="mainbutton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--default" data-upgraded=",MaterialButton,MaterialRipple">+<span class="mdl-button__ripple-container"><span class="mdl-ripple"></span></span>
-                </button>
-            </a>
-            <a onclick="setBrightness('brightest');return false;">
-                <button class="mainbutton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--default" data-upgraded=",MaterialButton,MaterialRipple">Max<span class="mdl-button__ripple-container"><span class="mdl-ripple"></span></span>
-                </button>
-            </a>
-        </div>
-        <h2>Colour: <span id="colorstatus"></span></h2>
-        <div id="colorButtons">
             <a onclick="setColor('White');return false;">
                 <button class="mainbutton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--white" data-upgraded=",MaterialButton,MaterialRipple"><span class="mdl-button__ripple-container"><span class="mdl-ripple"></span></span>
                 </button>
@@ -53,16 +44,16 @@
                 <button class="mainbutton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--red" data-upgraded=",MaterialButton,MaterialRipple"><span class="mdl-button__ripple-container"><span class="mdl-ripple"></span></span>
                 </button>
             </a>
-            <a onclick="setColor('Dark Orange');return false;">
-                <button class="mainbutton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--darkorange" data-upgraded=",MaterialButton,MaterialRipple"><span class="mdl-button__ripple-container"><span class="mdl-ripple"></span></span>
+            <a onclick="setBrightness('brighter');return false;">
+                <button class="mainbutton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--default" data-upgraded=",MaterialButton,MaterialRipple">+<span class="mdl-button__ripple-container"><span class="mdl-ripple"></span></span>
                 </button>
             </a>
+            <br>
+            <br>
             <a onclick="setColor('Orange');return false;">
                 <button class="mainbutton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--orange" data-upgraded=",MaterialButton,MaterialRipple"><span class="mdl-button__ripple-container"><span class="mdl-ripple"></span></span>
                 </button>
             </a>
-            <br>
-            <br>
             <a onclick="setColor('Amber');return false;">
                 <button class="mainbutton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--amber" data-upgraded=",MaterialButton,MaterialRipple"><span class="mdl-button__ripple-container"><span class="mdl-ripple"></span></span>
                 </button>
@@ -75,18 +66,14 @@
                 <button class="mainbutton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--green" data-upgraded=",MaterialButton,MaterialRipple"><span class="mdl-button__ripple-container"><span class="mdl-ripple"></span></span>
                 </button>
             </a>
+            <br>
+            <br>
             <a onclick="setColor('Light Blue');return false;">
                 <button class="mainbutton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--lightblue" data-upgraded=",MaterialButton,MaterialRipple"><span class="mdl-button__ripple-container"><span class="mdl-ripple"></span></span>
                 </button>
             </a>
-            <br>
-            <br>
             <a onclick="setColor('Blue');return false;">
                 <button class="mainbutton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--blue" data-upgraded=",MaterialButton,MaterialRipple"><span class="mdl-button__ripple-container"><span class="mdl-ripple"></span></span>
-                </button>
-            </a>
-            <a onclick="setColor('Indigo');return false;">
-                <button class="mainbutton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--indigo" data-upgraded=",MaterialButton,MaterialRipple"><span class="mdl-button__ripple-container"><span class="mdl-ripple"></span></span>
                 </button>
             </a>
             <a onclick="setColor('Purple');return false;">
@@ -101,6 +88,11 @@
             <br>
             <br>
         </div>
+        <a onclick="showLive();return false;" style="padding: -5px 0px 0px 15px;">
+            <button id="toggle" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--toggle">
+            <span id="show-live-text"><i id="live-circle"></i>View Live</span>
+            </button>
+        </a>
     </div>
 </body>
 
