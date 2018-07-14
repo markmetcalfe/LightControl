@@ -6,6 +6,9 @@ html, body {
 }
 
 body {
+	background-repeat: no-repeat;
+	background-size: cover;
+    background-position: center center;
     -moz-transition: background-color 2s, color 2s;
     -webkit-transition: background-color 2s, color 2s;
     transition: background-color 2s, color 2s;
@@ -14,6 +17,11 @@ body {
 body.dark {
     background-color: #1A1A1A; 
     color: #fff;
+}
+
+body.live {
+	color: #fff;    
+	text-shadow: 0 0 2px #000;
 }
 
 #container {
@@ -89,3 +97,34 @@ span {
 .Level_1 {
 	color:#4d4d00;
 }
+
+#show-live-text {
+	text-shadow: none;
+    color: black;
+    font-weight: 500;
+    letter-spacing: 3px;
+    margin-right: -3px;
+}
+
+@keyframes redcircleflash {
+    0%   {background-color:white;}
+    25%  {background-color:red;}
+    75%  {background-color:red;}
+    100%  {background-color:white;}
+}
+
+#live-circle {
+	content: " ";
+    color: red;
+    width: 0.5em;
+    height: 0.5em;
+    display: inline-block;
+    border-radius: 50%;
+    background-color: red;
+    animation-name: redcircleflash;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    margin-right: 6px;
+    margin-bottom: 1px;
+}
+

@@ -93,6 +93,24 @@ function fadeColor() {
     }
 }
 
+var live = false;
+function showLive(){
+    if(!live){
+        document.body.classList.add("live");
+        document.body.style.backgroundColor = null;
+        document.body.style.backgroundImage = "url('https://markmetcalfe.io/light/camera/')";
+        document.getElementById("show-live-text").innerHTML = 'Stop Stream';
+        live = true;
+    } else {
+        document.body.classList.remove("live");
+        document.body.style.backgroundImage = null;
+        fadeColor();
+        document.getElementById("show-live-text").innerHTML = '<i id="live-circle"></i>View Live';
+        live = false;
+    }
+    
+}
+
 /* 
  * Taken from http://stackoverflow.com/posts/13542669/revisions
  */
