@@ -49,7 +49,7 @@ gulp.task('scripts', function() {
   .bundle()
   .pipe(source('script.js'))
   .pipe(buffer())
-  //.pipe(uglify.apply())
+  .pipe(uglify.apply())
   .pipe($$.rename('bundle.js'))
   .pipe(gulp.dest(buildFolder))
 });
