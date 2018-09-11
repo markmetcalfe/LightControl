@@ -1,0 +1,13 @@
+{
+  "name": "Raspberry Pi Light Controller",
+  "short_name": "Light Control",
+  "start_url": "index.html",
+  "display": "standalone",
+  "icons": [{
+    "src": "logo.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }],
+  "background_color": "#FFFFFF",
+  "theme_color": "#CE14E5"
+}
