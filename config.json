@@ -1,25 +1,54 @@
 {
-    "min_brightness": 1,
-    "max_brightness": 4,
-    "colors": {
-        "White": "#FFFFFF",
-        "Red": "#ED1515",
-        "Orange": "#F79307",
-        "Amber": "#F7D307",
-        "Yellow": "#F2EE0A",
-        "Green": "#2AF72A",
-        "Light Blue": "#00DDFA",
-        "Blue": "#0059FF",
-        "Purple": "#BF00FF",
-        "Pink": "#F200FF",
-        "DEFAULT": "Pink"
+  "min_brightness": 1,
+  "max_brightness": 4,
+  "colors": [
+    {
+      "name": "White",
+      "hex": "FFFFFF"
     },
-    "timer": false,
-    "location": [
-        -41.3228,
-        174.7762
-    ],
-    "earliest_time": 11,
-    "latest_time": 17,
-    "command_url": "https://markmetcalfe.io/light/command/"
+    {
+      "name": "Red",
+      "hex": "ED1515"
+    },
+    {
+      "name": "Orange",
+      "hex": "F79307"
+    },
+    {
+      "name": "Amber",
+      "hex": "F7D307"
+    },
+    {
+      "name": "Yellow",
+      "hex": "F2EE0A"
+    },
+    {
+      "name": "Green",
+      "hex": "2AF72A"
+    },
+    {
+      "name": "Light Blue",
+      "hex": "00DDFA"
+    },
+    {
+      "name": "Blue",
+      "hex": "0059FF"
+    },
+    {
+      "name": "Purple",
+      "hex": "BF00FF"
+    },
+    {
+      "name": "Pink",
+      "hex": "F200FF"
+    }
+  ],
+  "timer": false,
+  "location": [
+    -41.3228,
+    174.7762
+  ],
+  "earliest_time": 11,
+  "latest_time": 17,
+  "command_url": "https://markmetcalfe.io/light/command/"
 }
