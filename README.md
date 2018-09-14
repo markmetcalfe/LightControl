@@ -1,6 +1,6 @@
 # LightControl
 
-A lightbulb that can be remotely controlled online 
+A lightbulb that can be remotely controlled online, with the ability to see it change live!
 
 ## Background
 
