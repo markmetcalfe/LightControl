@@ -1,6 +1,5 @@
 var fs = require('fs');
 var path = require('path');
-var del = require('del');
 var gulp = require('gulp');
 var browserify = require('browserify');
 var injectSvg = require('gulp-inject-svg');
@@ -11,9 +10,8 @@ var uglify = require('gulp-uglify-es').default;
 var $$ = require('gulp-load-plugins')();
 var autoprefixer = require('autoprefixer');
 var reload = browserSync.reload;
-var through2 = require('through2');
-var htmlclean = require('gulp-htmlclean');
 var source = require('vinyl-source-stream');
+var nodemon = require('gulp-nodemon');
 
 function handleError(err) {
   console.log(err.toString());
@@ -72,9 +70,28 @@ gulp.task('assets', function() {
 
 gulp.task('build', ['styles', 'scripts', 'assets', 'pages']);
 
-gulp.task('serve', ['build'], function() {
-  browserSync({ server: { baseDir: buildFolder } });
-  gulp.watch(devFolder + '**/*', ['build'], reload);
+gulp.task('nodemon', function (cb) {
+	var started = false;
+	return nodemon({
+    script: 'lightcontrol.js',
+	}).on('start', function () {
+		if (!started) {
+			cb();
+			started = true; 
+		} 
+	});
 });
 
-gulp.task('default', ['build']);
+gulp.task('serve', ['nodemon'], function() {
+	browserSync.init(null, {
+		proxy: "http://localhost:8002",
+    files: ["build/*"],
+    port: 7000,
+  });
+  gulp.watch(assetFolder + '**/*', ['assets'], reload);
+  gulp.watch(devFolder + '**/*.html', ['pages'], reload);
+  gulp.watch(devFolder + '**/*.js', ['scripts'], reload);
+  gulp.watch(devFolder + '**/*.scss', ['styles'], reload);
+});
+
+gulp.task('default', ['serve']);
