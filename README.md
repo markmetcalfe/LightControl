@@ -12,11 +12,13 @@ See it in action here: [markmetcalfe.io/light](https://markmetcalfe.io/light/)
 
 ## Usage
 To get it up and running, simply run:
-`
-npm i
+
+```
+npm install
 npm start
-`
-This will Light Control in your browser, ready to go!
+```
+
+This will launch Light Control in your browser, ready to go!
 
 ## Screenshots
 <img src="https://i.imgur.com/yLUlqx1.png" width="25%" height="auto"><img src="https://i.imgur.com/uV0OJvi.png" width="25%" height="auto"><img src="https://i.imgur.com/pYUq268.png" width="25%" height="auto"><img src="https://i.imgur.com/pvQsLrd.png" width="25%" height="auto">
